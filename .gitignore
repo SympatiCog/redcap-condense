@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.DS_Store
+# Keep real REDCap exports (which may contain PHI) out of the repo.
+*.csv

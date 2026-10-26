@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "redcap-condense"
+version = "0.1.0"
+description = "Condense longitudinal REDCap CSV exports to one row per record"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "SympatiCog, LLC" }]
+requires-python = ">=3.10"
+dependencies = ["pandas>=2.0"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[project.scripts]
+condense_redcap_csv = "redcap_condense:main"
+
+[tool.setuptools]
+py-modules = ["redcap_condense"]
