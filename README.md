@@ -1,10 +1,10 @@
 # redcap-condense
 
-Condense a longitudinal (multi-event, multi-arm) REDCap CSV export into a
-single wide file with **one row per record**.
+Condense a longitudinal (multi-event, multi-arm) REDCap CSV export into a single wide file with **one row per record**.
+This was developed as an internal tool for dealing with specific multi-arm data exports, but may be useful as a general tool for enwidening these types of REDCap exports.
 
-REDCap's longitudinal exports store one row per *(record, event)*, so a
-participant seen at baseline and follow-up spans several mostly-empty rows.
+REDCap's longitudinal (multi-event, multi-arm) exports store one row per *(record, event)*, so a
+participant seen at (e.g.) baseline and follow-up spans several mostly-empty rows.
 `redcap-condense` turns that into one row per record, with columns from each
 event side by side.
 
@@ -34,18 +34,18 @@ Without `--merge-arms`, each arm keeps its own columns
 ## What it does
 
 1. **Merge arms** (optional, `--merge-arms`): `baseline_arm_1` and
-   `baseline_arm_2` both become `baseline`, and the arm number goes in a
-   `redcap_arm` column.
+    `baseline_arm_2` both become `baseline`, and the arm number goes in a
+    `redcap_arm` column.
 2. **Record-level columns** such as `redcap_data_access_group` are taken once
-   per record and placed right after the record ID.
+    per record and placed right after the record ID.
 3. **Split by event** using `redcap_event_name`.
 4. **Drop empty columns** within each event.
 5. **Drop empty events**: events with no values outside bookkeeping columns
-   (`*_complete`, `*_timestamp`, `redcap_*`). Unchecked checkboxes (`0`)
-   don't count as values.
+    (`*_complete`, `*_timestamp`, `redcap_*`). Unchecked checkboxes (`0`)
+    don't count as values.
 6. **Suffix shared fields**: a field that survives in more than one event
-   gets the event name appended (`weight__baseline`). Fields found in only
-   one event keep their original name.
+    gets the event name appended (`weight__baseline`). Fields found in only
+    one event keep their original name.
 7. **Join** the events side by side on the record ID.
 
 The record ID is read as text, so leading zeros (`0001`) are preserved, and
@@ -72,7 +72,7 @@ python -m redcap_condense export.csv wide.csv
 ```
 
 | Option | Default | Description |
-| --- | --- | --- |
+| ------ | ------- | ----------- |
 | `--record-id COL` | first column | Record ID column. |
 | `--event-col COL` | `redcap_event_name` | Event column. |
 | `--how {outer,inner}` | `outer` | `outer` keeps every record; `inner` keeps only records present in every kept event. |
@@ -81,7 +81,7 @@ python -m redcap_condense export.csv wide.csv
 | `--record-cols COL[,COL...]` | `redcap_data_access_group` | Comma-separated record-level columns kept once per record. `''` for none. |
 | `--sep SEP` | `__` | Separator between field and event name. |
 | `--repeats {error,drop}` | `error` | Handling of repeating instrument/event rows. |
-| `-v` / `-q` | | More or less logging. |
+| `-v` / `-q` |  | More or less logging. |
 
 Exit codes: `0` success, `1` the export could not be condensed or parsed,
 `2` file or argument problem.
@@ -104,24 +104,24 @@ wide = condenser.condense_csv("export.csv")
 
 ## Things to know
 
-- **Export with raw variable names**, not labels. The tool needs the
-  `redcap_event_name` column and unique event names such as `baseline_arm_1`.
-  An export without an event column is treated as a classic (non-longitudinal)
-  project.
-- **Repeating instruments and events** would produce several rows per
-  record, so they are rejected by default. Remove them from the report, or
-  pass `--repeats drop` to discard them with a warning.
-- **`--merge-arms`** needs event names ending in `_arm_N`. It stops with an
-  error if a record is enrolled in more than one arm.
-- **Column names depend on the data.** A field is suffixed only if it
-  appears in more than one kept event, so a later export with new data
-  can rename columns (`moca` becomes `moca__followup` once baseline values
-  appear). Pin column names in downstream code with care.
-- Rows with a blank event name are dropped with a warning. Name collisions
-  caused by suffixing raise an error; choose a different `--sep`.
-- **Protected health information.** REDCap exports often contain PHI. The
-  included `.gitignore` excludes `*.csv` so exports aren't committed by
-  accident.
+* **Export with raw variable names**, not labels. The tool needs the
+    `redcap_event_name` column and unique event names such as `baseline_arm_1`.
+    An export without an event column is treated as a classic (non-longitudinal)
+    project.
+* **Repeating instruments and events** would produce several rows per
+    record, so they are rejected by default. Remove them from the report, or
+    pass `--repeats drop` to discard them with a warning.
+* **`--merge-arms`** needs event names ending in `_arm_N`. It stops with an
+    error if a record is enrolled in more than one arm.
+* **Column names depend on the data.** A field is suffixed only if it
+    appears in more than one kept event, so a later export with new data
+    can rename columns (`moca` becomes `moca__followup` once baseline values
+    appear). Pin column names in downstream code with care.
+* Rows with a blank event name are dropped with a warning. Name collisions
+    caused by suffixing raise an error; choose a different `--sep`.
+* **Protected health information.** REDCap exports often contain PHI. The
+    included `.gitignore` excludes `*.csv` so exports aren't committed by
+    accident.
 
 ## Development
 
